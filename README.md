@@ -22,3 +22,7 @@ streamlit run damage_detect.py
 
 # Future Scope:
 1) I have used YoloV5s model. So further complex models can be created with more data.
+
+# Refernce:
+https://github.com/xugaoxiang/yolov5-streamlit
+https://github.com/ultralytics/yolov5
