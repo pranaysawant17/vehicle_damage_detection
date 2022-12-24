@@ -20,6 +20,16 @@ pip install -r requirements.txt
 # Running streamlit 
 streamlit run damage_detect.py
 
+# Dockerhub :
+This app availbale as Docker Image. Use following coomands for runnig the app.:
+
+docker pull pranaysawant17/damage_detect_app
+
+docker run -p 8501:8501 pranaysawant17/damage_detect_app
+
+http://localhost:8501/ 
+
+
 # Future Scope:
 1) I have used YoloV5s model. So further complex models can be created with more data.
 
