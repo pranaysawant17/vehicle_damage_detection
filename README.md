@@ -1,4 +1,4 @@
-# vehicle_damage_detection
+# Project Name : Vehicle Damage Detection
 
 This project is for detecting the damage on car during accident.
 I have used YOLO v5 for model building and Streamlit for creating web app.
@@ -19,3 +19,6 @@ pip install -r requirements.txt
 
 # Running streamlit 
 streamlit run damage_detect.py
+
+# Future Scope:
+1) I have used YoloV5s model. So further complex models can be created with more data.
