@@ -5,16 +5,13 @@ import cv2
 from io import StringIO
 import os
 import shutil
-import time
 from zipfile import ZipFile
 from glob import glob
 
-##----- Company Logo and adddres ------ # 
 
-# st.sidebar.image("https://marktine.com/wp-content/uploads/2022/01/logo.svg", use_column_width=True)
 
 with st.sidebar:
-    st.title("Car Damage Detection")
+    st.title("Vehicle Damage Detection")
 
 
 
@@ -22,18 +19,21 @@ with st.sidebar:
 # Function for model integration with streamlit 
 
 def convert_df(df):
+   '''
+      For convering datframe to CSV
+   '''
    return df.to_csv().encode('utf-8')
 
 
 
 def image_dt(uploaded_file,model):
-    #im= cv2.imread(os.path.join('data/images/',uploaded_file.name))[:,:,::-1]
-    #model.project='/JPEG'
+    '''
+    Detcting damages using damage detction model on images.
+    '''
+
     img1=model(os.path.join('data/images/',uploaded_file.name))
     df=img1.pandas().xyxy[0]
     img1=img1.save(f'data/images/output/{uploaded_file.name}')
-    # img1.save()
-    #cv2.imwrite('JPEG/'+uploaded_file.name,img1)
 
     return df
 
@@ -41,24 +41,28 @@ def image_dt(uploaded_file,model):
 
     
 def video_dt(uploaded_file,model):
-    vid= cv2.VideoCapture(os.path.join("data", "videos", uploaded_file.name)) 
-    
-    
+    '''
+    Detcting damages using damage detction model on videos.
+    '''
 
-    
+
+    vid= cv2.VideoCapture(os.path.join("data", "videos", uploaded_file.name))     
     i=0
-    for i in range(300):
+    for i in range(1000): #Limited to 1000 frames for now.
         hasFrames,image = vid.read()
-        #im=cv2.imread(image)
-        re=model(image[..., ::-1])
-        print(type(re))
-        # 'cv2.imwrite("cctv2/"+"image"+str(i)+".jpg", image) '
-        # re.save(os.path.join('data/images/output','im'+str(i)+'.jpg'),'re')
-         
-        re.save(f'data/images/output/{uploaded_file.name}')    
-        shutil.copy(os.path.join(max(glob("runs/detect/*/"), key=os.path.getmtime),"image0.jpg"), os.path.join('result','im'+str(i)+'.jpg'))  
+        if i% 1 == 0:
+            re=model(image[..., ::-1])
+            print(type(re))
+            # 'cv2.imwrite("cctv2/"+"image"+str(i)+".jpg", image) '
+            # re.save(os.path.join('data/images/output','im'+str(i)+'.jpg'),'re')
+            
+            re.save(f'data/images/output/{uploaded_file.name}')    
+            shutil.copy(os.path.join(max(glob("runs/detect/*/"), key=os.path.getmtime),"image0.jpg"), os.path.join('result','im'+str(i)+'.jpg')) 
+        else:
+            pass 
 
         i+=1
+        print(i)
     
     images = [img for img in os.listdir('result') if img.endswith(".jpg")]
     temp_vid=uploaded_file.name.split('.')[0]+'.webm'
@@ -71,6 +75,9 @@ def video_dt(uploaded_file,model):
         os.remove(os.path.join('result',i))
 
     video.release()
+
+    # using zipper to create zip file of video for downloading.
+
     old_path = os.getcwd()
     os.chdir('zipr')
     shutil.make_archive(uploaded_file.name.split('.')[0], 'zip',root_dir=os.path.join('vid',temp_vid))
@@ -81,7 +88,7 @@ def video_dt(uploaded_file,model):
    
 
 #-----Uplaoding Picture and video ------ # 
-#Note: incase of file not found error ensure the directory has the required path 
+
 
 
 def upload(model):
@@ -125,6 +132,7 @@ def upload(model):
             st.image(os.path.join(max(glob("runs/detect/*/"), key=os.path.getmtime),temp_img))
             st.table(df)
             csv = convert_df(df)
+
             st.download_button("Download CSV",csv,"file.csv","text/csv",key='download-csv'
             )
             with open(os.path.join(max(glob("runs/detect/*/"), key=os.path.getmtime),temp_img), "rb") as file:
@@ -154,6 +162,8 @@ pass
 
 
 def pg1():
+
+    # Using pytorch hub inference of Yolov5 for loading model
     model = torch.hub.load('ultralytics/yolov5', 'custom', path = "model/dam_det.pt",force_reload=True)
     
 
@@ -163,7 +173,7 @@ def pg1():
 
 
 page_names_to_funcs = {
-    "Car Damage Detection":pg1,
+    "Vehicle Damage Detection":pg1,
    
 }
 
